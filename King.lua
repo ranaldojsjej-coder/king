@@ -1,4 +1,4 @@
--- [[ 👑 VOIDWARE: OVERSEER EDITION (FULL FINAL BUILD) 👑 ]] --
+-- [[ 👑 VOIDWARE: OVERSEER EDITION (FIXED & FULL) 👑 ]] --
 local P = game:GetService("Players")
 local RS = game:GetService("RunService")
 local WS = game:GetService("Workspace")
@@ -16,7 +16,7 @@ LP.Idled:Connect(function()
 end)
 
 -- База состояний
-local S = {G=false, Inv=false, Nc=false, Fly=false, FlyS=50, UWS=false, WS=16, UJP=false, JP=50, BH=false, Jes=false, Spd=false, AA=false, FL=false, TS=false, KA=false, Aim=false, FOV=500, Smth=0.5, ESP=false, Chm=false, Tgt=nil, Flg=false, Orb=false, Att=false, MF=false, BHl=false, Trn=false, Rch=false, HB=false, HBS=15, Spasm=false, XR=false, Acid=false, Rain=false, Spin=false, CFly=false, PFlg=false, CSp=false, Tox=false, AClk=false}
+local S = {UWS=false, WS=16, UJP=false, JP=50, Fly=false, FlyS=50, Nc=false, InfJ=false, BH=false, Aim=false, FOV=500, Smth=0.5, HB=false, HBS=15, Rch=false, KA=false, MF=false, Tgt=nil, Flg=false, Att=false, ESP=false, Chm=false, CFly=false}
 
 if CG:FindFirstChild("VW_APEX") then CG.VW_APEX:Destroy() end
 local Gui = Instance.new("ScreenGui", CG)
@@ -34,7 +34,6 @@ Instance.new("UICorner", TglBtn).CornerRadius = UDim.new(1, 0)
 Instance.new("UIStroke", TglBtn).Color = Color3.fromRGB(255, 0, 50)
 Instance.new("UIStroke", TglBtn).Thickness = 2
 
--- 🔴 ГЛАВНОЕ МЕНЮ 🔴
 local MF = Instance.new("Frame", Gui)
 MF.Size = UDim2.new(0, 700, 0, 500)
 MF.Position = UDim2.new(0.5, -350, 0.5, -250)
@@ -55,7 +54,7 @@ local TT = Instance.new("TextLabel", TB)
 TT.Size = UDim2.new(1, -15, 1, 0)
 TT.Position = UDim2.new(0, 15, 0, 0)
 TT.BackgroundTransparency = 1
-TT.Text = "VOIDWARE OVERSEER (FULL ULTIMATE EDITION)"
+TT.Text = "VOIDWARE OVERSEER (FIXED EDITION)"
 TT.TextColor3 = Color3.fromRGB(255, 0, 50)
 TT.Font = Enum.Font.GothamBold
 TT.TextSize = 16
@@ -179,36 +178,59 @@ local function MkTab(name)
     return E, page
 end
 
--- ================= ВКЛАДКИ =================
+-- ================= ВКЛАДКИ (С ИСПРАВЛЕНИЯМИ ОТКЛЮЧЕНИЯ) =================
 local T1 = MkTab("👤 Игрок & Статы")
 T1:Box("Своя Скорость:", "Напр: 100", function(t) S.WS = tonumber(t) or 16 end)
-T1:T("⚡ ПРИМЕНИТЬ СКОРОСТЬ", function(v) S.UWS = v end)
+T1:T("⚡ ПРИМЕНИТЬ СКОРОСТЬ", function(v) 
+    S.UWS = v 
+    if not v and LP.Character and LP.Character:FindFirstChildOfClass("Humanoid") then LP.Character.Humanoid.WalkSpeed = 16 end 
+end)
 T1:Box("Свой Прыжок:", "Напр: 100", function(t) S.JP = tonumber(t) or 50 end)
-T1:T("🚀 ПРИМЕНИТЬ ПРЫЖОК", function(v) S.UJP = v end)
+T1:T("🚀 ПРИМЕНИТЬ ПРЫЖОК", function(v) 
+    S.UJP = v 
+    if not v and LP.Character and LP.Character:FindFirstChildOfClass("Humanoid") then LP.Character.Humanoid.JumpPower = 50 end 
+end)
 T1:Box("Скорость Полета:", "Напр: 100", function(t) S.FlyS = tonumber(t) or 50 end)
 T1:T("✈️ Включить Полет (Fly)", function(v) S.Fly = v end)
-T1:T("👻 Noclip (Проход сквозь стены)", function(v) S.Nc = v end)
-T1:T("🌊 Ходить по воде", function(v) S.Jes = v end) 
-T1:T("🐇 Распрыжка (B-Hop)", function(v) S.BH = v end)
+T1:T("👻 Noclip", function(v) 
+    S.Nc = v 
+    if not v and LP.Character then 
+        for _, p in pairs(LP.Character:GetChildren()) do if p:IsA("BasePart") then p.CanCollide = true end end 
+    end 
+end)
+T1:T("🐇 Бесконечный прыжок", function(v) S.InfJ = v end) 
+
+-- Бесконечный прыжок (работает всегда корректно)
+UIS.JumpRequest:Connect(function()
+    if S.InfJ and LP.Character and LP.Character:FindFirstChildOfClass("Humanoid") then
+        LP.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+    end
+end)
 
 local T2 = MkTab("⚔️ Аимбот & Бой")
-T2:T("🎯 Включить Клиентский Aimbot", function(v) S.Aim = v end) 
+T2:T("🎯 Aimbot", function(v) S.Aim = v end) 
 T2:Box("Радиус Аима (FOV):", "Стандарт: 500", function(t) S.FOV = tonumber(t) or 500 end)
-T2:T("🔲 Хитбоксы (РАБОТАЮТ БЕЗ ЗАВИСАНИЙ)", function(v) S.HB = v end) 
+T2:T("🔲 Хитбоксы", function(v) S.HB = v end) 
 T2:Box("Размер Хитбокса:", "Напр: 15", function(t) S.HBS = tonumber(t) or 15 end)
-T2:T("🗡️ Огромный Меч (Reach)", function(v) S.Rch = v end) 
-T2:T("🌪️ Kill Aura (Толкать всех вокруг)", function(v) S.KA = v end) 
-
-local T3 = MkTab("🌍 Сервер & Хаос")
-T3:T("☠️ MASS FLING (РАЗНОС СЕРВЕРА)", function(v) S.MF = v end) 
-T3:T("🌪️ Торнадо Блоков (Физика)", function(v) S.Trn = v end) 
-T3:B("🔨 Выдать BTools", function() 
-    for _, v in pairs({"Hammer", "Clone", "Grab"}) do 
-        Instance.new("HopperBin", LP.Backpack).BinType = Enum.BinType[v] 
-    end 
+T2:T("🗡️ Огромный Меч (Reach)", function(v) 
+    S.Rch = v 
+    if not v and LP.Character then 
+        local t = LP.Character:FindFirstChildOfClass("Tool")
+        if t and t:FindFirstChild("Handle") then t.Handle.Size = Vector3.new(1, 0.8, 4) t.Handle.Massless = false end
+    end
+end) 
+T2:T("🌪️ Kill Aura", function(v) 
+    S.KA = v 
+    if not v and LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then LP.Character.HumanoidRootPart.RotVelocity = Vector3.zero end 
 end) 
 
--- Админ Панель (Одна Кнопка)
+local T3 = MkTab("🌍 Сервер & Хаос")
+T3:T("☠️ MASS FLING", function(v) 
+    S.MF = v 
+    if not v and LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then LP.Character.HumanoidRootPart.RotVelocity = Vector3.zero end 
+end) 
+T3:B("🔨 Выдать BTools", function() for _, v in pairs({"Hammer", "Clone", "Grab"}) do Instance.new("HopperBin", LP.Backpack).BinType = Enum.BinType[v] end end) 
+
 local T4, p4 = MkTab("🎯 Админ Панель")
 local TargetBtn = Instance.new("TextButton", p4)
 TargetBtn.Size = UDim2.new(1, -10, 0, 35)
@@ -256,31 +278,18 @@ end
 TargetBtn.MouseButton1Click:Connect(function() PList.Visible = not PList.Visible if PList.Visible then UpdPlrs() end end)
 
 T4:B("📍 ТП к Жертве", function() if S.Tgt and S.Tgt.Character then LP.Character.HumanoidRootPart.CFrame = S.Tgt.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 3) end end)
-T4:T("☠️ Сбивать жертву насмерть (Fling)", function(v) S.Flg = v end) 
-T4:T("⛓️ Attach (Сесть на голову цели)", function(v) S.Att = v end) 
+T4:T("☠️ Сбивать жертву (Fling)", function(v) 
+    S.Flg = v 
+    if not v and LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then LP.Character.HumanoidRootPart.RotVelocity = Vector3.zero end 
+end) 
+T4:T("⛓️ Присосаться (Attach)", function(v) S.Att = v end) 
 
 local T5 = MkTab("👁️ ESP & ВХ")
-T5:T("🏷️ ESP Имена", function(v) 
-    S.ESP = v 
-    if not v then 
-        for _, p in pairs(P:GetPlayers()) do 
-            if p.Character and p.Character:FindFirstChild("Head") and p.Character.Head:FindFirstChild("VE") then p.Character.Head.VE:Destroy() end 
-        end 
-    end 
-end)
-T5:T("🌟 Chams (Подсветка синяя)", function(v) 
-    S.Chm = v 
-    if not v then 
-        for _, p in pairs(P:GetPlayers()) do if p.Character and p.Character:FindFirstChild("VC") then p.Character.VC:Destroy() end end 
-    end 
-end)
+T5:T("🏷️ ESP Имена", function(v) S.ESP = v end)
+T5:T("🌟 Chams", function(v) S.Chm = v end)
 
-local T6 = MkTab("🚗 Транспорт & Фан")
-T6:T("🚗 Car Fly (Полет машины)", function(v) S.CFly = v end)
-T6:B("🚀 Прыжок Машины", function() 
-    local s = LP.Character:FindFirstChildOfClass("Humanoid") 
-    if s and s.SeatPart then s.SeatPart.Parent.PrimaryPart.Velocity = Vector3.new(0, 250, 0) end 
-end)
+local T6 = MkTab("🚗 Транспорт")
+T6:T("🚗 Car Fly", function(v) S.CFly = v end)
 
 if #TabsList > 0 then
     TabsList[1].p.Visible = true
@@ -288,8 +297,7 @@ if #TabsList > 0 then
     TabsList[1].b.BackgroundColor3 = Color3.fromRGB(255, 0, 50)
 end
 
--- ================= ЛОГИКА И ИСПРАВЛЕНИЯ =================
-local oA = 0
+-- ================= ЛОГИКА =================
 RS.Heartbeat:Connect(function()
     pcall(function()
         local c = LP.Character if not c then return end 
@@ -300,15 +308,17 @@ RS.Heartbeat:Connect(function()
         if S.UWS then h.WalkSpeed = S.WS end
         if S.UJP then h.JumpPower = S.JP end
         if S.Fly then r.Velocity = Vector3.new(0, 50, 0) r.CFrame = r.CFrame + Cam.CFrame.LookVector * (S.FlyS / 50) end
-        if S.CFly then 
-            local s = h.SeatPart 
-            if s and s.Parent then 
-                s.Parent.PrimaryPart.Velocity = Vector3.new(0, 50, 0) 
-                s.Parent.PrimaryPart.CFrame = s.Parent.PrimaryPart.CFrame + Cam.CFrame.LookVector * (S.FlyS / 50) 
-            end 
-        end
-        if S.BH and h.MoveDirection.Magnitude > 0 then h.Jump = true end
         
+        -- ИСПРАВЛЕННЫЙ REACH (ОГРОМНЫЙ МЕЧ)
+        if S.Rch then
+            local tool = c:FindFirstChildOfClass("Tool")
+            if tool and tool:FindFirstChild("Handle") then
+                tool.Handle.Size = Vector3.new(25, 25, 25)
+                tool.Handle.Transparency = 0.5
+                tool.Handle.Massless = true
+            end
+        end
+
         if S.KA then 
             r.RotVelocity = Vector3.new(0, 45000, 0) 
             for _, p in pairs(P:GetPlayers()) do 
@@ -316,8 +326,6 @@ RS.Heartbeat:Connect(function()
                     r.CFrame = p.Character.HumanoidRootPart.CFrame * CFrame.new(0,0,0.5)
                 end 
             end 
-        elseif not S.MF and not S.Flg then 
-            r.RotVelocity = Vector3.zero 
         end
         
         if S.MF then 
@@ -358,15 +366,14 @@ RS.RenderStepped:Connect(function()
         for _, pl in pairs(P:GetPlayers()) do
             if pl ~= LP and pl.Character and pl.Character:FindFirstChild("Head") then
                 local head = pl.Character.Head
-                -- ИСПРАВЛЕННЫЙ ХИТБОКС (Игроки больше не виснут)
                 if S.HB then 
                     head.Size = Vector3.new(S.HBS, S.HBS, S.HBS) 
                     head.Transparency = 0.6 
                     head.CanCollide = false 
-                    head.Massless = true -- Делаем блок легким, чтобы физика сервера не ломалась
+                    head.Massless = true 
                 else
-                    if head.Size.X > 5 then
-                        head.Size = Vector3.new(2, 1, 1) -- Сброс к норме
+                    if head.Size.X > 2 then
+                        head.Size = Vector3.new(1.2, 1, 1) 
                         head.Transparency = 0
                         head.CanCollide = true
                         head.Massless = false
@@ -382,6 +389,7 @@ RS.RenderStepped:Connect(function()
                 else 
                     if head:FindFirstChild("VE") then head.VE:Destroy() end 
                 end
+                
                 if S.Chm then 
                     if not pl.Character:FindFirstChild("VC") then local hl = Instance.new("Highlight", pl.Character) hl.Name = "VC" hl.FillTransparency = 0.5 end 
                     pl.Character.VC.FillColor = Color3.fromRGB(0, 150, 255)
